@@ -24,7 +24,6 @@ app.use('/api/slots', slotRoutes);
 mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/krishiconnect')
   .then(() => console.log('✅ Connected to MongoDB Database'))
   .catch(err => console.error('❌ Database Connection Error:', err));
-
 const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => {
