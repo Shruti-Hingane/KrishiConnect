@@ -26,6 +26,9 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/krishiconne
   .catch(err => console.error('❌ Database Connection Error:', err));
 
 const PORT = process.env.PORT || 5000;
+app.get('/', (req, res) => {
+    res.send('KrishiConnect Backend Server is Live!');
+});
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
