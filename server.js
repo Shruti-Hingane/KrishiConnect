@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors());
 
 // Serve Static Frontend Files
-app.use(express.static(path.join(__dirname, 'frontend')));
+app.use(express.static(path.join(__dirname, 'FrontEnd')));
 
 // Routes
 const authRoutes = require('./routes/auth');
@@ -27,7 +27,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/krishiconne
 const PORT = process.env.PORT || 5000;
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend/index.html'));
+    res.sendFile(path.join(__dirname, 'FrontEnd/index.html'));
 });
 
 app.listen(PORT, () => {
