@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api';
+const API_URL = "https://krishiconnect-qwwz.onrender.com";
 let currentUser = JSON.parse(localStorage.getItem('krishi_user')) || null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -139,7 +139,7 @@ async function handleSignUp(e) {
   const password = document.getElementById('signup-password').value;
 
   try {
-    const res = await fetch(`${API_URL}/auth/signup`, {
+    const res = await fetch(`${API_URL}/api/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role, name, phone, password })
@@ -164,7 +164,7 @@ async function handleLogin(e) {
   const password = document.getElementById('login-password').value;
 
   try {
-    const res = await fetch(`${API_URL}/auth/login`, {
+    const res = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone, password })
@@ -204,7 +204,7 @@ async function handleSlotBooking(e) {
   const hubLocation = document.getElementById('book-hub').value;
 
   try {
-    const res = await fetch(`${API_URL}/slots/book`, {
+    const res = await fetch(`${API_URL}/api/slots/book`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -232,7 +232,7 @@ async function handleSlotBooking(e) {
 async function loadFarmerSlots() {
   if (!currentUser) return;
   try {
-    const res = await fetch(`${API_URL}/slots/farmer/${currentUser.id}`);
+    const res = await fetch(`${API_URL}/api/slots/farmer/${currentUser.id}`);
     const slots = await res.json();
 
     const tbody = document.getElementById('farmer-slots-table');
@@ -261,7 +261,7 @@ async function loadFarmerSlots() {
 
 async function loadAllSlotsForOfficer() {
   try {
-    const res = await fetch(`${API_URL}/slots/all`);
+    const res = await fetch(`${API_URL}/api/slots/all`);
     const slots = await res.json();
 
     const tbody = document.getElementById('officer-slots-table');
@@ -290,7 +290,7 @@ async function loadAllSlotsForOfficer() {
 
 async function updateStatus(slotId, status, qualityGrade) {
   try {
-    const res = await fetch(`${API_URL}/slots/update-status/${slotId}`, {
+    const res = await fetch(`${API_URL}/api/slots/update-status/${slotId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status, qualityGrade })
@@ -324,7 +324,7 @@ async function handleSimulatedSMS(e) {
     const farmerPhone = parts[3];
 
     try {
-      const res = await fetch(`${API_URL}/slots/book`, {
+      const res = await fetch(`${API_URL}/api/slots/book`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -358,7 +358,7 @@ async function handleSimulatedSMS(e) {
     const tokenId = parts[1].toUpperCase();
 
     try {
-      const res = await fetch(`${API_URL}/slots/status/${encodeURIComponent(tokenId)}`);
+      const res = await fetch(`${API_URL}/api/slots/status/${encodeURIComponent(tokenId)}`);
       const data = await res.json();
 
       if (res.ok && data.slot) {
@@ -461,24 +461,20 @@ function applyLanguage(lang) {
     lucide.createIcons();
   }
 }
+
 let mandiMap = null;
 
 function initMandiMap() {
-  // Prevent re-initialization error if user switches tabs
   if (mandiMap !== null) return;
 
-  // Default center coordinates (e.g., Central Region)
   const defaultCoords = [19.0760, 72.8777];
-  
   mandiMap = L.map('mandi-map').setView(defaultCoords, 9);
 
-  // OpenStreetMap tile layer
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
     attribution: '© OpenStreetMap'
   }).addTo(mandiMap);
 
-  // Sample Mandi Procurement Hubs Data
   const hubs = [
     {
       name: "Hub #1 - Central Mandi",
@@ -506,7 +502,6 @@ function initMandiMap() {
     }
   ];
 
-  // Add markers to the map
   hubs.forEach(hub => {
     const marker = L.marker([hub.lat, hub.lng]).addTo(mandiMap);
     
@@ -527,17 +522,17 @@ function initMandiMap() {
   });
 }
 
-// Hook map initialization into tab switching logic
 const originalSwitchTab = switchTab;
 switchTab = function(tabName) {
   originalSwitchTab(tabName);
   if (tabName === 'farmer' || tabName === 'home') {
     setTimeout(() => {
       initMandiMap();
-      if (mandiMap) mandiMap.invalidateSize(); // Fixes tile rendering issues on tab switch
+      if (mandiMap) mandiMap.invalidateSize();
     }, 200);
   }
 };
+
 document.addEventListener('DOMContentLoaded', () => {
   const toggleBtn = document.getElementById('chatbot-toggle-btn');
   const closeBtn = document.getElementById('chatbot-close-btn');
@@ -546,29 +541,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const chatInput = document.getElementById('chat-input');
   const chatMessages = document.getElementById('chat-messages');
 
-  // Toggle Chat Visibility
-  toggleBtn.addEventListener('click', () => chatWindow.classList.toggle('hidden'));
-  closeBtn.addEventListener('click', () => chatWindow.classList.add('hidden'));
+  if (toggleBtn && closeBtn && chatWindow) {
+    toggleBtn.addEventListener('click', () => chatWindow.classList.toggle('hidden'));
+    closeBtn.addEventListener('click', () => chatWindow.classList.add('hidden'));
+  }
 
-  // Handle User Message Submission
-  chatForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const query = chatInput.value.trim();
-    if (!query) return;
+  if (chatForm && chatInput && chatMessages) {
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const query = chatInput.value.trim();
+      if (!query) return;
 
-    appendMessage(query, 'user');
-    chatInput.value = '';
+      appendMessage(query, 'user');
+      chatInput.value = '';
 
-    // Process Response after brief simulated thinking delay
-    setTimeout(() => {
-      const reply = generateAiResponse(query);
-      appendMessage(reply, 'bot');
-    }, 600);
-  });
+      setTimeout(() => {
+        const reply = generateAiResponse(query);
+        appendMessage(reply, 'bot');
+      }, 600);
+    });
+  }
 
   window.sendQuickQuery = function(text) {
-    chatInput.value = text;
-    chatForm.dispatchEvent(new Event('submit'));
+    if (chatInput && chatForm) {
+      chatInput.value = text;
+      chatForm.dispatchEvent(new Event('submit'));
+    }
   };
 
   function appendMessage(text, sender) {
@@ -590,7 +588,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.lucide) lucide.createIcons();
   }
 
-  // Simulated Conversational Logic for Hub Delays and Status Checks
   function generateAiResponse(input) {
     const text = input.toLowerCase();
 
